@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+  <title>Create a custom widget - 4.9</title>
+
+  <style>
+    .esri-hello-world {
+      font-family: "Helvetica Neue", sans-serif;
+      display: inline-block;
+    }
+
+    .esri-hello-world--emphasis {
+      font-weight: bold;
+    }
+	
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+  </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <link rel="stylesheet" href="app/css/CustomBasemapGallery.css">
+  <script>
+  var locationPath = location.pathname.replace(/\/[^\/]+$/, "");
+  window.dojoConfig = {
+    packages: [
+      {
+        name: "app",
+        location: locationPath + "/app"
+      }
+    ]
+  };
+  </script>
+  <script src="https://js.arcgis.com/4.9/"></script>
+  <script>
+    var widget;
+
+    require([
+      "app/NewWidget",
+      "app/CustomBasemapGallery",
+      "esri/widgets/Expand",
+      "esri/WebMap",
+      "esri/views/MapView"
+    ], function(
+      NewWidget,
+      CustomBasemapGallery,
+      Expand,
+      WebMap,
+      MapView
+    ) {
+
+      var map = new WebMap({
+        portalItem: {
+          id: "243cd45ee6ce4415ac119e44fcaca5bf"
+        }
+      });
+
+      var view = new MapView({
+        container: "viewDiv",
+        map: map,
+        zoom: 13,
+        center: [2.36, 48.875]
+      });
+
+      var names = [
+        {
+          firstValue: "Great",
+          lastValue: "Widget"
+        },
+        {
+          firstValue: "Awsome",
+          lastValue: "Widget"
+        },
+        {
+          firstValue: "Super",
+          lastValue: "Widget"
+        }],
+        nameIndex = 0;
+
+      var newWidget = new NewWidget({
+        firstValue: names[nameIndex].firstValue,
+        lastValue: names[nameIndex].lastValue,
+        container: "widgetDiv"
+      });
+
+      function changeName() {
+        newWidget.set(names[++nameIndex % names.length]);
+      }
+
+      newWidget.on("greeted", function(event) {
+        console.log(event);
+      })
+      setInterval(changeName, 1000);
+
+      var customWidget = new CustomBasemapGallery({
+        view: view
+      });
+
+      // store customized widget in expand widget
+      var expand = new Expand({
+        content: customWidget
+      });
+
+      view.ui.add(expand, "top-right");
+    });
+
+  </script>
+</head>
+
+<body>
+  <div id="widgetDiv"></div>
+  <div id="viewDiv"></div>
+</body>
+</html>
